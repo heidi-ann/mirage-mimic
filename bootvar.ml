@@ -29,4 +29,4 @@ let get t parameter =
     Not_found -> Printf.printf "Boot parameter %s not found\n" parameter; raise Not_found
 
 
-let to_string = List.map (fun x,y -> x^"="^y^" ")
+let to_string = List.map (fun (x,y) -> x^"="^y^" ")
