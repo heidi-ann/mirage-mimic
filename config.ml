@@ -1,6 +1,6 @@
 open Mirage
 
-let main = foreign "Unikernel.Main" (console @-> network entropy @-> kv_ro @-> job)
+let main = foreign "Unikernel.Main" (console @-> network @-> entropy @-> kv_ro @-> job)
 
 let platform =
     match get_mode () with
