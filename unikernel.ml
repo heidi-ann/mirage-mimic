@@ -132,7 +132,7 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
     | `Error e -> fail (Failure ("Error starting " ^ name))
     | `Ok t -> return t 
 
-  let start c n = 
+  let start c n e kv = 
     (* show help on boot *)
     Printf.printf "*** mirage-mimic supported boot options ***\n";
     Printf.printf "Accepted parameters in extra= are: \n";
