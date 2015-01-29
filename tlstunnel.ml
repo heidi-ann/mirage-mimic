@@ -97,35 +97,10 @@ struct
 
   open Ipaddr
 
-  let peer = ((V4.of_string_exn "127.0.0.1", 4433), "localhost")
-  let peer = ((V4.of_string_exn "2.19.157.15", 443), "www.apple.com")
-  let peer = ((V4.of_string_exn "74.125.195.103", 443), "www.google.com")
-  let peer = ((V4.of_string_exn "10.0.0.1", 4433), "localhost")
-  let peer = ((V4.of_string_exn "23.253.164.126", 443), "tls.openmirage.org")
-  let peer = ((V4.of_string_exn "216.34.181.45", 443), "slashdot.org")
-
-  let initial = Cstruct.of_string @@
-    "GET / HTTP/1.1\r\nConnection: Close\r\nHost: " ^ snd peer ^ "\r\n\r\n"
-
-  let chat c tls =
-    let rec dump () =
-      TLS.read tls >>== fun buf ->
-        L.log_data c "recv" buf >> dump () in
-    TLS.write tls initial >> dump ()
-
-  let start c stack e kv =
+  let start c stack e kv dst =
     TLS.attach_entropy e >>
     lwt authenticator = X509.authenticator kv `CAs in
     let conf          = Tls.Config.client ~authenticator () in
-    S.TCPV4.create_connection (S.tcpv4 stack) (fst peer)
-    >>= function
-    | `Error e -> L.log_error c (`Flow e)
-    | `Ok tcp  ->
-        TLS.client_of_flow conf (snd peer) tcp
-        >>== chat c
-        >>= function
-        | `Error e -> L.log_error c e
-        | `Eof     -> L.log_trace c "eof."
-        | `Ok _    -> assert false
+    S.TCPV4.create_connection (S.tcpv4 stack) dst
 
 end

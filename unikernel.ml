@@ -24,6 +24,7 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
 
   (* modules for TLS *)
   module TLSS = Tlstunnel.Server(C)(Stack)(E)(KV)
+  module TLSC = Tlstunnel.Server(C)(Stack)(E)(KV)
 
   type flowpair = {
     incoming : Stack.T.flow;
@@ -128,6 +129,17 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
           read_and_forward flowpairs c output_flow input_flow
         ]
 
+  let connect_tls c s e kv dst flowpairs input_flow =
+    TLSC.start c s e kv dst  >>= function
+    | `Error e -> Printf.printf "Unable to connect to TLS server"
+    | `Ok output_flow  ->
+      flowpairs := [{incoming=input_flow; outgoing=output_flow}] @ !(flowpairs);
+      Lwt.choose [
+          read_and_forward flowpairs c input_flow output_flow;
+          read_and_forward flowpairs c output_flow input_flow
+        ]
+
+
   (* from mirage-skeleton *)
   let or_error name fn t =
     fn t
@@ -188,7 +200,11 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
                     let dest_ip = Ipaddr.V4.of_string_exn (Bootvar.get bootvar "dest_ip") in
                     let flowpairs = ref [] in
                     fun flow -> connect_tcp c s dest_ip port flowpairs flow
-            | `TLS -> (fun flow -> fail (Failure "TLS forwarding mode not supported"))
+            | `TLS -> 
+                    let dest_ip = Ipaddr.V4.of_string_exn (Bootvar.get bootvar "dest_ip") in
+                    let dest_port = (*FIX*) Ipaddr.V4.of_string_exn 4433 in
+                    let flowpairs = ref [] in
+                    (fun flow -> connect_tls c s e kv (dest_ip,dest_port) flowpairs flow)
             | `UNKNOWN -> (fun flow -> fail (Failure "Forwarding mode unknown or the boot parameter 'forward_mode' was not set"))
     end in
     let listen_mode = `TCP in
