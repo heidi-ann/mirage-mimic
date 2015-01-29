@@ -9,7 +9,7 @@ open Re_str
    accepted parameters.
 *)
 
-module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) = struct
+module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_RO) = struct
 
   (* Manually set up stack so we can request IP in start function *)
   module Stack = struct
