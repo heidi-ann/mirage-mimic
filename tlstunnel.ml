@@ -76,11 +76,11 @@ struct
       | `Error e -> L.log_error c e
       | `Eof     -> L.log_trace c "eof."
 
-  let start c stack e kv =
+  let start c stack e kv p =
     TLS.attach_entropy e >>
     lwt cert = X509.certificate kv `Default in
     let conf = Tls.Config.server ~certificates:(`Single cert) () in
-    S.listen_tcpv4 stack 4433 (accept c conf handle) ;
+    S.listen_tcpv4 stack p (accept c conf handle) ;
     S.listen stack
 
 end
