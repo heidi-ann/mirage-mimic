@@ -23,8 +23,7 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
   module Socks = Socks.SOCKS4 (Stack)
 
   (* modules for TLS *)
-  module TLS  = Tls_mirage.Make (Stack.T) (E)
-  module X509 = Tls_mirage.X509 (KV) (Clock)
+  module TLSS = Tls.Server(C)(Netif)(E)(KV)
 
   type flowpair = {
     incoming : Stack.T.flow;
@@ -201,6 +200,6 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
                     Stack.listen s
               end
     | `TLS -> begin
-                    Tls.Server(C)(Netif)(E)(KV).start c n e kv
+                    TLSS.start c n e kv
               end
 end
