@@ -22,6 +22,10 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
   end
   module Socks = Socks.SOCKS4 (Stack)
 
+  (* modules for TLS *)
+  module TLS  = Tls_mirage.Make (Stack.T) (E)
+  module X509 = Tls_mirage.X509 (KV) (Clock)
+
   type flowpair = {
     incoming : Stack.T.flow;
     outgoing : Stack.T.flow;
