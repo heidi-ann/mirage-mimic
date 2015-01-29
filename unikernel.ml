@@ -131,7 +131,7 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
 
   let connect_tls c s e kv dst flowpairs input_flow =
     (* TLSC.start c s e kv dst *)
-    Stack.T.create_connection (Stack.tcpv4 s) (dest_ip, dest_port) >>= fun dest_con -> 
+    Stack.T.create_connection (Stack.tcpv4 s) dst >>= fun dest_con -> 
     match dest_con with 
     | `Error e -> Printf.printf "Unable to connect to TLS server"
     | `Ok output_flow  ->
