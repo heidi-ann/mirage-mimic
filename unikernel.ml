@@ -200,6 +200,6 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
                     Stack.listen s
               end
     | `TLS -> begin
-                    TLSS.start c Stack.t e kv
+                    TLSS.start c s e kv
               end
 end
