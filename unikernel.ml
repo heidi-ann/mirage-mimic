@@ -23,7 +23,7 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
   module Socks = Socks.SOCKS4 (Stack)
 
   (* modules for TLS *)
-  module TLSS = Tlstunnel.Server(C)(Netif)(E)(KV)
+  module TLSS = Tlstunnel.Server(C)(Stack.T)(E)(KV)
 
   type flowpair = {
     incoming : Stack.T.flow;
