@@ -201,6 +201,6 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
                     Stack.listen s
               end
     | `TLS -> begin
-                    Tls.Server(C,Netif,E,KV).start c n e kv
+                    Tls.Server(C)(Netif)(E)(KV).start c n e kv
               end
 end
