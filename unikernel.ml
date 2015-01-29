@@ -130,7 +130,8 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
         ]
 
   let connect_tls c s e kv dst flowpairs input_flow =
-    TLSC.start c s e kv dst  >>= function
+    TLSC.start c s e kv dst >>= fun dest_con -> 
+    match dest_con with 
     | `Error e -> Printf.printf "Unable to connect to TLS server"
     | `Ok output_flow  ->
       flowpairs := [{incoming=input_flow; outgoing=output_flow}] @ !(flowpairs);
@@ -204,7 +205,7 @@ module Main (C: V1_LWT.CONSOLE) (Netif : V1_LWT.NETWORK) (E : ENTROPY) (KV : KV_
                     let dest_ip = Ipaddr.V4.of_string_exn (Bootvar.get bootvar "dest_ip") in
                     let dest_port = (*FIX*) Ipaddr.V4.of_string_exn 4433 in
                     let flowpairs = ref [] in
-                    (fun flow -> connect_tls c s e kv (dest_ip,dest_port) flowpairs flow)
+                    fun flow -> connect_tls c s e kv (dest_ip,dest_port) flowpairs flow
             | `UNKNOWN -> (fun flow -> fail (Failure "Forwarding mode unknown or the boot parameter 'forward_mode' was not set"))
     end in
     let listen_mode = `TCP in
